@@ -4,6 +4,7 @@ import { StyleSheet, Text, View, Button, Image, Modal } from "react-native";
 import { createAppContainer } from "react-navigation";
 import { createStackNavigator } from 'react-navigation-stack';
 import { createBottomTabNavigator } from "react-navigation-tabs";
+import { createDrawerNavigator } from "react-navigation-drawer";
 
 const HomeScreen = ({ navigation }) => {
   return (
@@ -18,7 +19,7 @@ const HomeScreen = ({ navigation }) => {
             "https://www.eafit.edu.co/idiomas/maravillas-espanol/frijolesconchicharron/Medias/Thumbnails/home-page.png.png",
         }}
       />
-      <Button title="Information" onPress={() => navigation.push("Detalle")} />
+      <Button title="Information" onPress={() => navigation.openDrawer()} />
     </View>
   );
 };
@@ -45,6 +46,9 @@ const Logo = () => {
 };
 
 HomeScreen.navigationOptions = {
+  drawerIcon: ({ tintColor }) => {
+    return <Ionicons name='ios-home' size={25} color={tintColor}/>
+  },
   headerTitle: <Logo />,
   headerRight: (
     <View style={{ paddingRight: 5 }}>
@@ -63,10 +67,12 @@ const InformationScreen = ({ navigation }) => {
   );
 };
 
-InformationScreen.navigationOptions = ({ navigation }) => {
-  return {
-    headerTitle: <Logo />,
-  };
+InformationScreen.navigationOptions = {
+  drawerIcon: ({ tintColor }) => {
+    return (
+      <Ionicons name="ios-information-circle" size={25} color={tintColor} />
+    );
+  },
 };
 
 const ContactScreen = ({ navigation }) => {
@@ -80,7 +86,15 @@ const ContactScreen = ({ navigation }) => {
   );
 };
 
-const AppNavigator = createBottomTabNavigator(
+ContactScreen.navigationOptions = {
+  drawerIcon: ({ tintColor }) => {
+    return (
+      <Ionicons name="ios-mail" size={25} color={tintColor} />
+    );
+  },
+};
+
+const AppNavigator = createDrawerNavigator(
   {
     Home: { screen: HomeScreen },
     Information: { screen: InformationScreen },
@@ -88,40 +102,24 @@ const AppNavigator = createBottomTabNavigator(
   },
   {
     initialRouteName: "Home",
-    defaultNavigationOptions: ({ navigation }) => ({
-      tabBarIcon: ({ focused, horizontal, tintColor }) => {
-        const { routeName } = navigation.state;
-        let iconName;
-        if (routeName == "Home") {
-          iconName = `ios-home`;
-        } else if (routeName == "Contact") {
-          iconName = `ios-mail`;
-        } else {
-          iconName = `ios-information-circle`;
-        }
-
-        return <Ionicons name={iconName} size={20} tintColor={tintColor} />;
-      },
-      tabBarOptions: {
-        activeTintColor: "black",
-        activeBackgroundColor: "#6DB8FE",
-        inactiveTintColor: "black",
-        labelStyle: { fontSize: 20 },
-        style: {
-          backgroundColor: "white",
-        },
-      },
-    }),
   }
 );
 
-const RootStack = createStackNavigator({
-  Main: AppNavigator,
-  MiModal: () => <Text>Hla</Text>
-},{
-  mode: 'modal',
-  headerMode: 'none'
-})
+const RootStack = createStackNavigator(
+  {
+    Main: AppNavigator,
+    MiModal: ({navigation}) => (
+      <>
+        <Text>Hla</Text>
+        <Button title='cerrar' onPress={() => navigation.goBack()} />
+      </>
+    ),
+  },
+  {
+    mode: "modal",
+    headerMode: "none",
+  }
+);
 
 export default createAppContainer(RootStack);
 
